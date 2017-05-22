@@ -122,7 +122,7 @@ class socket(object):
         """
         status_code = _vmcilib.vmci_bind(self._fd, port)
         if status_code == SOCKET_ERROR_CODE:
-            raise SockError(self.error)
+            raise SocketError(self.error)
 
     def connect(self, address, flags=0):
         """
@@ -141,7 +141,7 @@ class socket(object):
         """
         status_code = _vmcilib.vmci_listen(backlog)
         if status_code == SOCKET_ERROR_CODE:
-            raise SockError(self.error)
+            raise SocketError(self.error)
 
     def accept(self):
         """
@@ -153,12 +153,12 @@ class socket(object):
         if sockfd == SOCKET_ERROR_CODE:
             raise SocketError(self.error)
 
-        return self.fromfd(self.type, self.protocol, self._fd), (cid.value, port.value)
+        return self.fromfd(self.type, self.protocol, sockfd), (cid.value, port.value)
 
     def send(self, string, flags=0):
         """
         """
-        buffered_data = ctypes.c_buffer(data)
+        buffered_data = ctypes.c_buffer(string)
         status_code = _vmcilib.vmci_send(self._fd, buffered_data, len(buffered_data), flags)
         if status_code == SOCKET_ERROR_CODE:
             raise SocketError()
@@ -169,16 +169,21 @@ class socket(object):
         received_data = ctypes.c_buffer(bufsize) 
         status_code = _vmcilib.vmci_recv(self._fd, received_data, bufsize, 0)
         if status_code == SOCKET_ERROR_CODE:
-            raise SocketError()
+            raise SocketError(self.error)
+
+        return received_data.value
 
     def sendto(self, string, address):
         """
         """
+        raise NotImplementedError
         cid, port = address
 
     def recvfrom():
         """
         """
+        raise NotImplementedError
+
         pass
 
     def shutdown(self, how):
@@ -186,4 +191,4 @@ class socket(object):
         """
         status_code = _vmcilib.shutdown(self._fd, how)
         if status_code == SOCKET_ERROR_CODE:
-            raise SocketError()
+            raise SocketError(self.error)

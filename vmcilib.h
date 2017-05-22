@@ -15,6 +15,7 @@
 
 /********************************************* MACROS *********************************************/
 
+/* Configure includes and macros based on os type */
 #ifdef _WIN32
 	#include <windows.h>
 	#define _export __declspec(dllexport)
@@ -131,12 +132,15 @@ int vmci_listen(socket_t sockfd, int backlog);
 
 /* *************************************************************************************************
  * Name		: vmci_accept
- * Purpose	:
+ * Purpose	: Accept incoming connection.
  * Arguments:
- * Returns 	:
+ * 				IN: socket_t sockfd - The accepting socket.
+ * 				OUT: int *cid - The connecting machine's cid.
+ *				OUT: port_t *port - The port the connection is using.
+ * Returns 	: socket_t - The new socket file descriptor.
  * ************************************************************************************************/
 _export 
-socket_t vmci_accept(int, int*, port_t port);
+socket_t vmci_accept(socket_t sockfd, int *cid, port_t *port);
 
 /* *************************************************************************************************
  * Name		: vmci_send

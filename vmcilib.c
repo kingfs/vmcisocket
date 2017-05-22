@@ -14,11 +14,10 @@
 
 /******************************************** GLOBALS *********************************************/
 
-static int devfd = -1;
 static int AF_VMCI = AF_VMCI_DEFAULT;
 
-/********************************************* TYPES **********************************************/
 /**************************************** IMPLEMENTATIONS *****************************************/
+
 _export 
 int vmci_errno()
 {
@@ -68,6 +67,21 @@ _export
 int vmci_listen(socket_t sockfd, int backlog)
 {
 	return listen(sockfd, backlog);
+}
+
+_export
+socket_t vmci_accept(socket_t sockfd, int *cid, port_t *port)
+{
+	socket_t return_value = -1;
+	sockaddr_vm_t vm_addr = {0};
+	socklen_t addr_len = sizeof(vm_addr);
+	
+	return_value = accept(sockfd, (struct sockaddr*)&vm_addr, &addr_len);
+
+	*cid = vm_addr.svm_cid;
+	*port = vm_addr.svm_port;
+
+	return return_value;
 }
 
 _export 
@@ -121,21 +135,21 @@ int vmci_close(socket_t sockfd)
 __attribute__((constructor)) 
 static void construcor(void)
 {
-	AF_VMCI = VMCISock_GetAFValueFd(&devfd);
+	AF_VMCI = VMCISock_GetAFValue();
 }
 
 /* *************************************************************************************************
  * Name		: destructor
  * Purpose	: deinitializes the AF_VMCI variable
  * Remarks	: Called when shared library is freed
- * ************************************************************************************************/
+ * TODO: Check if removing it doesn't break anything
+ * ************************************************************************************************
 __attribute__((destructor)) 
 static void destructor(void) 
 {
-	VMCISock_ReleaseAFValueFd(devfd);
 	AF_VMCI = AF_VMCI_DEFAULT;
 }
-
+*/
 
 #ifdef _WIN32
 BOOL WINAPI DllMain(HINSTANCE hinsDLL, DWORD fdwReason, LPVOID lpvReserved)
