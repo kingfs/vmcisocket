@@ -13,10 +13,12 @@ import socket as _socket
 
 # ==================================================== EXCEPTIONS ==================================================== #
 
+
 class SocketError(_socket.error):
     """
     """
     pass
+
 
 class SocketCreationError(SocketError):
     """
@@ -24,7 +26,8 @@ class SocketCreationError(SocketError):
     pass
 
 # ==================================================== CONSTANTS ===================================================== #
-# === PUBLIC === #
+
+
 SOCK_STREAM = _socket.SOCK_STREAM
 SOCK_DGRAM = _socket.SOCK_DGRAM
 DEFAULT_PROTOCOL = 0
@@ -39,7 +42,7 @@ _VMCILIBSO = os.path.join(_LOCAL_DIRECTORY, "libvmci.so")
 
 # ================================================= IMPORT TIME CODE ================================================= #
 
-# If this code runs on a Windows machine, load the VMCI dll. Else, we're probably running on a Linux machine, 
+# If this code runs on a Windows machine, load the VMCI dll. Else, we're probably running on a Linux machine,
 # load the shared object
 if os.name == _WINDOWS:
     _vmcilib = ctypes.windll.LoadLibrary(_VMCILIBDLL)
@@ -49,10 +52,12 @@ else:
 # ===================================================== GLOBALS ====================================================== #
 # ==================================================== FUNCTIONS ===================================================== #
 
+
 def get_local_cid():
     return _vmcilib.vmci_get_local_cid()
 
 # ===================================================== CLASSES ====================================================== #
+
 
 class socket(object):
     """
@@ -82,7 +87,7 @@ class socket(object):
 
     def __del__(self):
         """
-        @summary: Destructor. 
+        @summary: Destructor.
         """
         self.close()
 
@@ -132,7 +137,7 @@ class socket(object):
 
         # Connect to machine
         status_code = _vmcilib.vmci_connect(self._fd, cid, port, flags)
-        
+
         if status_code == SOCKET_ERROR_CODE:
             raise SocketError(self.error)
 
@@ -146,10 +151,10 @@ class socket(object):
     def accept(self):
         """
         """
-        cid = ctypes.c_int() 
+        cid = ctypes.c_int()
         port = ctypes.c_int()
-        
-        sockfd = _vmci.vmci_accept(self._fd, byref(cid), byref(port))
+
+        sockfd = _vmcilib.vmci_accept(self._fd, byref(cid), byref(port))
         if sockfd == SOCKET_ERROR_CODE:
             raise SocketError(self.error)
 
@@ -166,7 +171,7 @@ class socket(object):
     def recv(self, bufsize, flags=0):
         """
         """
-        received_data = ctypes.c_buffer(bufsize) 
+        received_data = ctypes.c_buffer(bufsize)
         status_code = _vmcilib.vmci_recv(self._fd, received_data, bufsize, 0)
         if status_code == SOCKET_ERROR_CODE:
             raise SocketError(self.error)
@@ -183,8 +188,6 @@ class socket(object):
         """
         """
         raise NotImplementedError
-
-        pass
 
     def shutdown(self, how):
         """
